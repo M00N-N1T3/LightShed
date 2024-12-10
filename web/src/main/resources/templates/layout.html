@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/layout.html}">
+<head>
+    <title>LightInTheShed</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div>
+    <h1>Loadshedding Stage</h1>
+    <p></p>
+    <div th:if="${exception}">
+        <p th:text="${messages}"></p>
+    </div>
+    <div>
+        <form id="form" method="GET" th:action="@{/provinces.action}">
+            <div class="form-box">
+                <label for="province">Province</label>
+                <select id="province"  name="province" th:onchange="this.form.submit()">
+                    <option th:each="province : ${#lists.sort(provinces)}"
+                            th:value="${province}"
+                            th:text="${province}"
+                            th:selected="${province == selectedProvince}">Province</option>
+                </select>
+            </div>
+            <div class="form-box">
+                <label for="towns">Town</label>
+                <select id="towns" name="town" th:unless="${towns}">
+                    <option>Town</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

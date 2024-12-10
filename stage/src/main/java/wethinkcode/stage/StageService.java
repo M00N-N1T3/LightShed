@@ -1,40 +1,45 @@
 package wethinkcode.stage;
 
-
 import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
-import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
-import wethinkcode.loadshed.common.transfer.StageDO;
+import wethinkcode.common.configurator.Configurator;
+import wethinkcode.common.transfer.StageDO;
+import wethinkcode.stage.router.Router;
 
 /**
- * I provide a REST API that reports the current loadshedding "stage". I provide two endpoints:
+ * I provide a REST API that reports the current loadshedding "stage". I provide
+ * two endpoints:
  * <dl>
  * <dt>GET /stage
- * <dd>report the current stage of loadshedding as a JSON serialisation of a {@code StageDO} data/transfer object
+ * <dd>report the current stage of loadshedding as a JSON serialisation
+ *      of a {@code StageDO} data/transfer object
  * <dt>POST /stage
- * <dd>set a new loadshedding stage/level by POSTing a JSON-serialised {@code StageDO} instance as the body of the
- * request.
+ * <dd>set a new loadshedding stage/level by POSTing a JSON-serialised {@code StageDO}
+ *      instance as the body of the request.
  * </ul>
  */
-public class StageService
+public class StageService implements Runnable
 {
     public static final int DEFAULT_STAGE = 0; // no loadshedding. Ha!
 
-    public static final int DEFAULT_PORT = 7001;
+    private int loadSheddingStage;
+    private Javalin server;
+    public static int DEFAULT_PORT = 7001;
+    private String APP_DIR = "stage";
+    private int servicePort;
+    private StageDO stageDO = new StageDO();
 
-    public static final String MQ_TOPIC_NAME = "stage";
+    // Configuration keys
+    public static final String CFG_CONFIG_FILE = "config.file";
+    public static final String CFG_DATA_DIR = "data.dir";
+    public static final String CFG_SERVICE_PORT = "server.port";
+
 
     public static void main( String[] args ){
         final StageService svc = new StageService().initialise();
         svc.start();
     }
 
-    private int loadSheddingStage;
-
-    private Javalin server;
-
-    private int servicePort;
 
     @VisibleForTesting
     StageService initialise(){
@@ -43,15 +48,15 @@ public class StageService
 
     @VisibleForTesting
     StageService initialise( int initialStage ){
+        loadConfiguration();
         loadSheddingStage = initialStage;
         assert loadSheddingStage >= 0;
-
         server = initHttpServer();
         return this;
     }
 
     public void start(){
-        start( DEFAULT_PORT );
+        start(DEFAULT_PORT);
     }
 
     @VisibleForTesting
@@ -64,35 +69,33 @@ public class StageService
         server.stop();
     }
 
+    @Override
     public void run(){
         server.start( servicePort );
     }
 
     private Javalin initHttpServer(){
-        return Javalin.create()
-            .get( "/stage", this::getCurrentStage )
-            .post( "/stage", this::setNewStage );
+        server = Javalin.create( javalinConfig -> {
+//            javalinConfig.enableDevLogging();
+            javalinConfig.showJavalinBanner = false;
+        });
+        stageDO.setStage(loadSheddingStage);
+        Router.getRoutes(server,stageDO);
+        return server;
     }
 
-    private Context getCurrentStage( Context ctx ){
-        return ctx.json( new StageDO( loadSheddingStage ) );
-    }
+    /**
+     * loads the configuration files of our server. This includes the ports and the files for the database
+     */
+    private void loadConfiguration(){
 
-    private Context setNewStage( Context ctx ){
-        final StageDO stageData = ctx.bodyAsClass( StageDO.class );
-        final int newStage = stageData.getStage();
-        if( newStage >= 0 ){
-            loadSheddingStage = newStage;
-            broadcastStageChangeEvent( ctx );
-            ctx.status( HttpStatus.OK );
-        }else{
-            ctx.status( HttpStatus.BAD_REQUEST );
-        }
-        return ctx.json( new StageDO( loadSheddingStage ) );
-    }
+        Configurator configurator = new Configurator(CFG_CONFIG_FILE
+                ,CFG_SERVICE_PORT
+                ,CFG_DATA_DIR
+                ,APP_DIR
+                , DEFAULT_PORT);
 
-    private void broadcastStageChangeEvent( Context ctx ){
-        throw new UnsupportedOperationException( "TODO" );
+        DEFAULT_PORT = configurator.getPORT();
     }
 
 }

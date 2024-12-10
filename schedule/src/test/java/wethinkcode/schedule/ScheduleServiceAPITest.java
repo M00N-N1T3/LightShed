@@ -8,14 +8,15 @@ import kong.unirest.HttpResponse;
 import kong.unirest.HttpStatus;
 import kong.unirest.Unirest;
 import org.junit.jupiter.api.*;
-import wethinkcode.loadshed.common.transfer.ScheduleDO;
+import wethinkcode.common.transfer.ScheduleDO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * I am an API / functional test of the ScheduleService. I am not a unit test.
  */
-@Tag( "functional" )
+@Tag( "expensive" )
+//@Disabled( "Enable this to test your ScheduleService. DO NOT MODIFY THIS FILE.")
 public class ScheduleServiceAPITest
 {
     public static final int TEST_PORT = 8888;
@@ -55,8 +56,9 @@ public class ScheduleServiceAPITest
 
     @Test
     public void getSchedule_nonexistentTown(){
+        String path = serverUrl() + "/Mars/Elonsburg/4";
         HttpResponse<ScheduleDO> response = Unirest
-            .get( serverUrl() + "/Mars/Elonsburg/4" )
+            .get( path)
             .asObject( ScheduleDO.class );
         assertEquals( HttpStatus.NOT_FOUND, response.getStatus() );
         assertEquals( 0, response.getBody().numberOfDays() );

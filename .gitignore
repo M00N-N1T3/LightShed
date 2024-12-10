@@ -1,0 +1,13 @@
+# files
+*.idea/
+.idea/
+*target
+*que*
+
+*vscode*
+
+# msc
+*.zip
+*sandbox*
+
+

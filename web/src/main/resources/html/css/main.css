@@ -1,0 +1,80 @@
+#main-header {
+    text-align : center;
+    background-color: #007BFF;
+    color: white;
+    display: block;
+    padding: 10px 20px;
+}
+
+#selection-menu{
+    align-items : center;
+    padding: 25px;
+}
+
+.main {
+    display: flex;
+    flex-flow : column;
+    justify-content: center;
+}
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown button */
+.dropdown-btn {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Dropdown content */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    overflow-y: auto; /* Enables scrolling */
+    max-height: 200px; /* Limits height to make it scrollable */
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Hover effect for links */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Show the dropdown on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Show button hover effect */
+.dropdown-btn:hover {
+    background-color: #0056b3;
+}
+
+#form{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+.form-box{
+    padding: 10px;
+}

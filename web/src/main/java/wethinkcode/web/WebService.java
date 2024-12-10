@@ -2,42 +2,71 @@ package wethinkcode.web;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
+import io.javalin.apibuilder.EndpointGroup;
+import io.javalin.http.staticfiles.Location;
+import io.javalin.plugin.rendering.template.JavalinThymeleaf;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import wethinkcode.places.PlaceNameService;
-import wethinkcode.schedule.ScheduleService;
-import wethinkcode.stage.StageService;
+import wethinkcode.web.router.Router;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * I am the front-end web server for the LightSched project.
  * <p>
- * Remember that we're not terribly interested in the web front-end part of this server, more in the way it communicates
- * and interacts with the back-end services.
+ * Remember that we're not terribly interested in the web front-end part of this
+ * server, more in the way it communicates and interacts with the back-end
+ * services.
  */
 public class WebService
 {
 
-    public static final int DEFAULT_PORT = 80;
+    public static final int DEFAULT_PORT = 8011;
+    public static final String SESSION_USER_KEY = "user";
+    public static final String PAGES_DIR = "/html";
+    public static final String TEMPLATES_DIR = "/templates/";
+    private List<String> provinces;
 
-    public static final String STAGE_SVC_URL = "http://localhost:" + StageService.DEFAULT_PORT;
-
-    public static final String PLACES_SVC_URL = "http://localhost:" + PlaceNameService.DEFAULT_PORT;
-
-    public static final String SCHEDULE_SVC_URL = "http://localhost:" + ScheduleService.DEFAULT_PORT;
-
-    private static final String PAGES_DIR = "/html";
+    private TemplateEngine templateEngine(){
+        TemplateEngine templateEngine = new TemplateEngine();
+        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        // setting the prefix to where my template is
+        resolver.setPrefix(TEMPLATES_DIR);
+        // setting my resolver
+        templateEngine.setTemplateResolver(resolver);
+        templateEngine.addDialect(new LayoutDialect());
+        return templateEngine;
+    }
 
     public static void main( String[] args ){
         final WebService svc = new WebService().initialise();
         svc.start();
     }
 
-    private Javalin server;
+    private Javalin webServer;
 
     private int servicePort;
 
     @VisibleForTesting
     WebService initialise(){
-        // FIXME: Initialise HTTP client, MQ machinery and server from here
+        JavalinThymeleaf.configure(templateEngine());
+        webServer = Javalin.create(javalinConfig -> {
+            javalinConfig.addStaticFiles(PAGES_DIR, Location.CLASSPATH);
+            javalinConfig.defaultContentType = "application/json";
+//            javalinConfig.enableDevLogging();
+            javalinConfig.showJavalinBanner = false;
+        });
+
+        Router.configure(this);
+        // TODO: add http client and server configuration here
         return this;
+    }
+
+    public void routes(EndpointGroup group) {
+        webServer.routes(group);
     }
 
     public void start(){
@@ -51,11 +80,11 @@ public class WebService
     }
 
     public void stop(){
-        server.stop();
+        webServer.stop();
     }
 
     public void run(){
-        server.start( servicePort );
+        webServer.start( servicePort );
     }
 
     private void configureHttpClient(){

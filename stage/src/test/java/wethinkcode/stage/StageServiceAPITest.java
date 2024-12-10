@@ -8,7 +8,7 @@ import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONException;
 import org.junit.jupiter.api.*;
-import wethinkcode.loadshed.common.transfer.StageDO;
+import wethinkcode.common.transfer.StageDO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * I contain functional tests of the Stage Service.
  */
 @Tag( "expensive" )
+//@Disabled( "Enable this to test your ScheduleService. DO NOT MODIFY THIS FILE.")
 public class StageServiceAPITest
 {
     public static final int TEST_PORT = 7777;

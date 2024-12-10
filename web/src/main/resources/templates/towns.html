@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>LightInTheShed</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <div>
+            <h1>Loadshedding Stage</h1>
+            <p></p>
+            <div th:if="${exception}">
+                <p th:text="${messages}"></p>
+            </div>
+            <div id="form">
+                <form method="GET" th:action="@{/provinces.action}">
+                    <div class="form-box">
+                        <label for="province">Province</label>
+                        <select id="province"  name="province" th:onchange="this.form.submit()">
+                            <option th:text="${selectedProvince}" hidden="hidden" selected></option>
+                            <option th:each="province : ${provinces}"
+                                    th:value="${province}"
+                                    th:text="${province}"></option>
+                        </select>
+                    </div>
+                </form>
+                <form method="GET" th:action="@{/schedules.action}">
+                    <label for="selected-province" hidden></label>
+                    <input id="selected-province" name="province" hidden th:value="${selectedProvince}">
+                    <div class="form-box" >
+                        <label for="towns">Town</label>
+                        <select id="towns" name="town" th:onchange="this.form.submit()">
+                            <option value="" disabled selected>Select Town</option>
+                            <option th:each="town : ${towns}"
+                                    th:value="${town}"
+                                    th:text="${town}"></option>
+                        </select>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

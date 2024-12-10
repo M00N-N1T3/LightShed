@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{/layout.html}">
+    <head>
+        <title>LightInTheShed</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+    <div layout:fragment="main">
+        <h1>Loadshedding Stage</h1>
+        <p></p>
+        <div th:if="${exception}">
+            <p th:text="${messages}"></p>
+        </div>
+        <div>
+            <form id="form" th:action="@{/provinces.action}" method="GET">
+                <label for="province">Province</label>
+                <select id="province" name="province">
+                    <option value="" th:selected="${selectedProvince == null}" disabled hidden="hidden">Province</option>
+                    <option th:each="province : ${#lists.sort(provinces)}" th:value="${province}" th:text="${province}" th:selected="${province == selectedProvince}">Province</option>
+                </select>
+                <label for="towns" th:if="${towns}" >Town</label>
+                <select id="towns" name="town" th:if="${towns}">
+                    <option value="" th:selected="${selectedTown == null}" disabled hidden="hidden">Town</option>
+                    <option th:each="town : ${#lists.sort(towns)}" th:value="${town}" th:text="${town}" th:selected="${town == selectedTown}">Town</option>
+                </select>
+                <select id="towns" name="town" th:unless="${towns}">
+                    <option value="" th:selected="${selectedTown == null}" disabled>Town</option>
+<!--                    <option th:each="town : ${#lists.sort(towns)}" th:value="${town}" th:text="${town}" th:selected="${town == selectedTown}">Town</option>-->
+                </select>
+                <input id="stage" name="stage" type="number" min="0" max="8" value="4" hidden="hidden">
+            </form>
+            <table th:if="${schedule}">
+                <thead>
+                <tr>
+                    <th th:text="|${selectedTown}, ${selectedProvince}|">Place</th>
+                </tr>
+                <tr>
+                    <th>Dates</th>
+                    <th colspan="5">Slots</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="day, dayStat : ${schedule.days}" th:with="date=${scheduleDates[dayStat.index]}">
+                    <th th:text="${#dates.format(date, 'E, dd MMMM yyyy')}" colspan="1"></th>
+                    <td th:each="slot : ${day.slots}" th:text="|${slot.start} - ${slot.end}|"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

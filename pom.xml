@@ -11,20 +11,14 @@
         <module>schedule</module>
         <module>web</module>
         <module>common</module>
+        <module>sandbox</module>
+        <module>queue</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
-    <repositories>
-        <repository>
-            <id>common_lib</id>
-            <name>Project library</name>
-            <layout>default</layout>
-            <url>file:///${project.basedir}/common</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -42,11 +36,6 @@
             <artifactId>assertj-core</artifactId>
             <version>3.23.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-all</artifactId>
-            <version>6.1.4</version>
         </dependency>
     </dependencies>
     <build>
