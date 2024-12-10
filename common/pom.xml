@@ -32,6 +32,19 @@
             <version>2.17.2</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>javax.jms-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <!-- ActiveMQ Client -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>5.18.0</version>
+        </dependency>
     </dependencies>
 
 </project>
