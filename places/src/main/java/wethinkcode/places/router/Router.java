@@ -1,26 +1,20 @@
 package wethinkcode.places.router;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import wethinkcode.loadshed.common.modelview.ModelViewFormatter;
 import wethinkcode.places.model.Places;
 import wethinkcode.places.model.Town;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
-
-// jackson
 import com.fasterxml.jackson.databind.*;
 
-
-public class Router {
+public class Router extends ModelViewFormatter {
 
     private static Javalin server;
     private static Places places;
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static Javalin getRoutes(Javalin server, Places places){
 
@@ -37,7 +31,7 @@ public class Router {
     private static void apiHome(){
         // guide - note ctx = context
         server.get("/", ctx -> {
-            ctx.json(jsonifyModel(guideJSON()));
+            ctx.json(convertModelToJSON(guideJSON()));
         });
 
     }
@@ -47,7 +41,7 @@ public class Router {
             Collection<String> provinceList = places.provinces();
 
             String status = setStatusForProvinces(provinceList,ctx);
-            String data = jsonifyModel(provinceList.toArray());
+            String data = convertModelToJSON(provinceList.toArray());
             ctx.json(data);
         });
     }
@@ -82,7 +76,7 @@ public class Router {
             ctx.status(HttpStatus.OK);
 
             if (!towns.isEmpty()){
-                String data = jsonifyModel(model);
+                String data = convertModelToJSON(model);
                 ctx.json(data);
             }else{
                 ctx.json(new Object[0]);
@@ -110,31 +104,13 @@ public class Router {
     }
 
 
-    private static HashMap<String,Object> JSONModel(String api_version, Map<String,Object> endPointAndType,String status){
-        Map<String, Object> hashThisMap =  Map.of("api_version",api_version
-                ,"result",status
-                ,"endpoint",endPointAndType);
 
-        // found out only now that a Map is immutable while a hashMap is mutable thus the conversion
-        return new HashMap<>(hashThisMap); // storing our model in a hashMap
-
-    };
 
     private static Map<String,String> guideJSON(){
         return Map.of("name","Place-Name-Service"
                 ,"author","Johnny-Ilanga"
                 ,"version","1.0"
                 ,"endpoint","{type: {GET:{/, /provinces, /towns/{province-name} }, POST:{}}");
-    }
-
-    private static String jsonifyModel(Object data){
-
-        try{
-            return mapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
-            //
-        }
-        return "";
     }
 
     private static String  setStatus(Collection<Town> towns, Context ctx){
@@ -156,27 +132,4 @@ public class Router {
             ctx.status(HttpStatus.BAD_REQUEST);
         }
     }
-
-    private static JsonNode generateJSONNode(String jsonString){
-        try{
-            return mapper.readTree(jsonString);
-        } catch (JsonProcessingException e) {
-            // do nothing
-        }
-        return null;
-    }
-
-    private static JsonNode modelNode(Object model){
-        String jsonString = jsonifyModel(model);
-        return generateJSONNode(jsonString);
-    }
-
-
-    private static JsonNode modelNode(String modelAsString){
-        return generateJSONNode(modelAsString);
-    }
-
 }
-
-
-

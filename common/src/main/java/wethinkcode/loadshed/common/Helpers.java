@@ -1,6 +1,14 @@
-package wethinkcode.common;
+package wethinkcode.loadshed.common;
 
 public class Helpers {
+    public static boolean isDigit(String string){
+        try {
+            Integer.parseInt(string);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
 
     public static String capitalizeString(String string){
         StringBuilder capString = new StringBuilder();

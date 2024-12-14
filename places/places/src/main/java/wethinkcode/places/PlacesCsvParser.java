@@ -11,7 +11,7 @@ import wethinkcode.places.model.Places;
 import com.opencsv.CSVReader;
 import wethinkcode.places.model.Town;
 
-import static wethinkcode.common.Helpers.capitalizeString;
+import static wethinkcode.loadshed.commonHelpers.capitalizeString;
 
 
 /**

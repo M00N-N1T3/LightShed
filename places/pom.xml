@@ -10,8 +10,8 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <exec.mainClass>wethinkcode.places.Places</exec.mainClass>
     </properties>
     <dependencies>
@@ -63,11 +63,6 @@
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>wethinkcode</groupId>-->
-<!--            <artifactId>common</artifactId>-->
-<!--            <version>1.0</version>-->
-<!--        </dependency>-->
     </dependencies>
     <build>
         <plugins>

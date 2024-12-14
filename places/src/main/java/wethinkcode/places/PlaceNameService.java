@@ -5,7 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
-import wethinkcode.common.configurator.Configurator;
+import wethinkcode.loadshed.common.configurator.Configurator;
 
 import wethinkcode.places.fileloader.FileLoader;
 import wethinkcode.places.model.Places;

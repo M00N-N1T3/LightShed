@@ -1,9 +1,9 @@
-package wethinkcode.common.configurator;
+package wethinkcode.loadshed.common.configurator;
 
 import java.io.File;
 import java.util.*;
 
-import static wethinkcode.common.configurator.PropertiesFile.*;
+import static wethinkcode.loadshed.common.configurator.PropertiesFile.*;
 
 
 public class Configurator {

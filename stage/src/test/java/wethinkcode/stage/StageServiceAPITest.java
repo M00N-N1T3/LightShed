@@ -8,7 +8,7 @@ import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONException;
 import org.junit.jupiter.api.*;
-import wethinkcode.common.transfer.StageDO;
+import wethinkcode.loadshed.common.transfer.StageDO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

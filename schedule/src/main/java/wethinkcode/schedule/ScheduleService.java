@@ -7,10 +7,11 @@ import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
+import io.javalin.apibuilder.EndpointGroup;
 import wethinkcode.schedule.router.Router;
-import wethinkcode.common.transfer.DayDO;
-import wethinkcode.common.transfer.ScheduleDO;
-import wethinkcode.common.transfer.SlotDO;
+import wethinkcode.loadshed.common.transfer.DayDO;
+import wethinkcode.loadshed.common.transfer.ScheduleDO;
+import wethinkcode.loadshed.common.transfer.SlotDO;
 
 /**
  * I provide a REST API providing the current loadshedding schedule for a
@@ -22,7 +23,7 @@ public class ScheduleService
 
     public static final int DEFAULT_PORT = 7002;
 
-    private Javalin server;
+    Javalin scheduleServer;
 
     private int servicePort;
 
@@ -33,11 +34,11 @@ public class ScheduleService
 
     @VisibleForTesting
     ScheduleService initialise(){
-        server = Javalin.create( javalinConfig -> {
+        scheduleServer = Javalin.create(javalinConfig -> {
 //            javalinConfig.enableDevLogging();
             javalinConfig.showJavalinBanner = false;
         });
-        server = initHttpServer();
+        scheduleServer = initHttpServer();
         return this;
     }
 
@@ -52,16 +53,20 @@ public class ScheduleService
     }
 
     public void stop(){
-        server.stop();
+        scheduleServer.stop();
     }
 
     public void run(){
-        server.start( servicePort );
+        scheduleServer.start( servicePort );
+    }
+
+    public void routes(EndpointGroup group){
+        scheduleServer.routes(group);
     }
 
     private Javalin initHttpServer(){
-        return Router.getRoutes(server,this);
-//        throw new UnsupportedOperationException( "TODO" );
+        Router.configureRoutes(this);
+        return scheduleServer;
     }
 
     // There *must* be a better way than this...

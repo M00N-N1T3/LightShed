@@ -1,14 +1,14 @@
 package wethinkcode.places.fileloader;
 
-import wethinkcode.common.configurator.Configurator;
+import wethinkcode.loadshed.commonconfigurator.Configurator;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static wethinkcode.common.configurator.PropertiesFile.getProperty;
-import static wethinkcode.common.configurator.PropertiesFile.getPropertyFromBackup;
+import static wethinkcode.loadshed.commonconfigurator.PropertiesFile.getProperty;
+import static wethinkcode.loadshed.commonconfigurator.PropertiesFile.getPropertyFromBackup;
 
 public class FileLoader {
     private static File CSVFILE;

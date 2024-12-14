@@ -8,7 +8,7 @@ import kong.unirest.HttpResponse;
 import kong.unirest.HttpStatus;
 import kong.unirest.Unirest;
 import org.junit.jupiter.api.*;
-import wethinkcode.common.transfer.ScheduleDO;
+import wethinkcode.loadshed.common.transfer.ScheduleDO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

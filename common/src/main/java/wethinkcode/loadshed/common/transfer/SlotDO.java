@@ -1,12 +1,13 @@
 package wethinkcode.loadshed.common.transfer;
 
-import java.time.LocalTime;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalTime;
+
 /**
- * TODO: javadoc SlotDO
+ * The time slots when teh load shedding will take place in the day
+ * Each time slot consists of a <code>start-time</code> and an <code>end-time</code>
  */
 public class SlotDO
 {

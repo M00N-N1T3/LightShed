@@ -1,12 +1,6 @@
 package wethinkcode.loadshed.spikes;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
+import javax.jms.*;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import wethinkcode.loadshed.common.mq.MQ;
@@ -19,36 +13,33 @@ public class QueueReceiver implements Runnable
 {
     private static long NAP_TIME = 2000; //ms
 
-    public static final String MQ_QUEUE_NAME = "stage";
+    public static String MQ_QUEUE_NAME = "stage";
+
+    private boolean running = true;
+
+    private Connection connection;
 
     public static void main( String[] args ){
         final QueueReceiver app = new QueueReceiver();
         app.run();
     }
 
-    private boolean running = true;
-
-    private Connection connection;
-
+    public QueueReceiver(String MQ_Queue_Name){
+        MQ_QUEUE_NAME = MQ_Queue_Name;
+    }
+    
+    public QueueReceiver(){
+        
+    }
     @Override
     public void run(){
         setUpMessageListener();
+        startConnection();
         while( running ){
             // do other stuff...
-            System.out.println( "Still doing other things..." );
+//            System.out.println( "Still doing other things..." );
             snooze();
         }
-
-        // CAUTION: Notice that we OPEN the MQ `Connection` down in `setUpMessageListener()`,
-        // but we CLOSE it here in the higher-level method that _called_ `setUpMessageListener()`.
-        //
-        // In general we consider this to be Bad Practise. A Code Smell. You should strive to keep
-        // OPEN/CLOSE pairs (of anything: MQ connections, database connections, network connections,
-        // files...) at the SAME level in your code, making it easier to see that the
-        // OPENed object gets properly CLOSEd.
-        //
-        // FIXME: There are at least 3 ways to fix this "Unbalanced Open/Close" code smell.
-
         closeConnection();
         System.out.println( "Bye..." );
     }
@@ -67,14 +58,16 @@ public class QueueReceiver implements Runnable
             final Destination queueId = session.createQueue( MQ_QUEUE_NAME );
 
             final MessageConsumer receiver = session.createConsumer( queueId );
-            receiver.setMessageListener( new MessageListener() { //this anonymous inner-class could be replaced with a lambda
-                @Override
-                public void onMessage( Message m ){
-                    throw new UnsupportedOperationException( "TODO" );
+
+            // the more reciever instances we run the more consumers register in our ActiveMq site
+            receiver.setMessageListener(message -> {
+                // all messages from the que comes here
+                System.out.println("Message From Queue: " + message.toString());
+                if (message instanceof TextMessage){
+                    handleMessage(message);
                 }
             }
             );
-            connection.start();
 
         }catch( JMSException erk ){
             throw new RuntimeException( erk );
@@ -89,6 +82,25 @@ public class QueueReceiver implements Runnable
         }
     }
 
+    private boolean startConnection(){
+        try{
+            connection.start();
+            return true;
+        } catch (JMSException e) {
+            System.out.println("Failed to close...");
+            return false;
+        }
+
+    }
+
+    public void setRunningStatusTrue() {
+        running = true;
+    }
+
+    public void setRunningStatusFalse(){
+       running = false;
+    }
+
     private void closeConnection(){
         if( connection != null ) try{
             connection.close();
@@ -97,4 +109,18 @@ public class QueueReceiver implements Runnable
         }
     }
 
+    private void handleMessage(Message message){
+        try{
+            String body = ((TextMessage) message).getText();
+            if ("SHUTDOWN".equals(body)){
+                System.out.println("....shutting down the system....");
+                closeConnection();
+                System.exit(0);
+            }else{
+                System.out.println("Received message: " + body);
+            }
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

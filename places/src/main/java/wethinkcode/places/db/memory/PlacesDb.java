@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import wethinkcode.common.Helpers;
+import wethinkcode.loadshed.common.Helpers;
 import wethinkcode.places.model.Places;
 import wethinkcode.places.model.Town;
 

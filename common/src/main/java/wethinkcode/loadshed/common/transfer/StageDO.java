@@ -15,8 +15,16 @@ public class StageDO
         stage = 0;
     }
 
-    public StageDO( int s ){
-        stage = s;
+    public StageDO( int stage ){
+        this.stage = stage;
+    }
+
+    public StageDO(String stage){
+        this.stage = Integer.parseInt(stage);
+    }
+
+    public void setStage(int stage){
+        this.stage = stage;
     }
 
     public int getStage(){

@@ -2,8 +2,9 @@ package wethinkcode.stage;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
-import wethinkcode.common.configurator.Configurator;
-import wethinkcode.common.transfer.StageDO;
+import io.javalin.apibuilder.EndpointGroup;
+import wethinkcode.loadshed.common.configurator.Configurator;
+import wethinkcode.loadshed.common.transfer.StageDO;
 import wethinkcode.stage.router.Router;
 
 /**
@@ -23,11 +24,11 @@ public class StageService implements Runnable
     public static final int DEFAULT_STAGE = 0; // no loadshedding. Ha!
 
     private int loadSheddingStage;
-    private Javalin server;
+    private Javalin stageServer;
     public static int DEFAULT_PORT = 7001;
     private String APP_DIR = "stage";
     private int servicePort;
-    private StageDO stageDO = new StageDO();
+    public static StageDO stageDO = new StageDO();
 
     // Configuration keys
     public static final String CFG_CONFIG_FILE = "config.file";
@@ -51,7 +52,7 @@ public class StageService implements Runnable
         loadConfiguration();
         loadSheddingStage = initialStage;
         assert loadSheddingStage >= 0;
-        server = initHttpServer();
+        stageServer = initHttpServer();
         return this;
     }
 
@@ -66,22 +67,26 @@ public class StageService implements Runnable
     }
 
     public void stop(){
-        server.stop();
+        stageServer.stop();
     }
 
     @Override
     public void run(){
-        server.start( servicePort );
+        stageServer.start( servicePort );
     }
 
     private Javalin initHttpServer(){
-        server = Javalin.create( javalinConfig -> {
+        stageServer = Javalin.create(javalinConfig -> {
 //            javalinConfig.enableDevLogging();
             javalinConfig.showJavalinBanner = false;
+
         });
         stageDO.setStage(loadSheddingStage);
-        Router.getRoutes(server,stageDO);
-        return server;
+
+        Router.configureRoutes(this);
+        Router.configureEndpointNotFoundError(stageServer);
+        return stageServer;
+
     }
 
     /**
@@ -96,6 +101,10 @@ public class StageService implements Runnable
                 , DEFAULT_PORT);
 
         DEFAULT_PORT = configurator.getPORT();
+    }
+
+    public void routes(EndpointGroup group){
+        stageServer.routes(group);
     }
 
 }

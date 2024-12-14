@@ -1,4 +1,4 @@
-package wethinkcode.common.configurator;
+package wethinkcode.loadshed.common.configurator;
 
 import java.io.*;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package wethinkcode.loadshed.common.transfer;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
  * TODO: javadoc DayDO

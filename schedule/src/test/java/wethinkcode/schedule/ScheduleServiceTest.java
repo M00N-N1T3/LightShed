@@ -3,7 +3,7 @@ package wethinkcode.schedule;
 import java.util.Optional;
 
 import org.junit.jupiter.api.*;
-import wethinkcode.common.transfer.ScheduleDO;
+import wethinkcode.loadshed.common.transfer.ScheduleDO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

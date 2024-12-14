@@ -5,8 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.http.Handler;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import wethinkcode.common.transfer.ScheduleDO;
-import wethinkcode.common.transfer.StageDO;
+import wethinkcode.loadshed.common.transfer.ScheduleDO;
+import wethinkcode.loadshed.common.transfer.StageDO;
 import wethinkcode.schedule.ScheduleService;
 import wethinkcode.stage.StageService;
 
