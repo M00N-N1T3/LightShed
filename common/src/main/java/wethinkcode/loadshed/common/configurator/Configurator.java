@@ -95,7 +95,7 @@ public Configurator(String CFG_CONFIG_FILE, String CFG_SERVICE_PORT, String CFG_
 
         // FIXED
         if (!new File(CSV_FILE_DIR).exists()) CSV_FILE_DIR = correctFileDir(CSV_FILE_DIR);
-        if (!new File(CSV_FILE_NAME).exists()) CSV_FILE_NAME =  correctFileDir(CSV_FILE_DIR);
+        if (!new File(CSV_FILE_NAME).exists()) CSV_FILE_NAME =  CSV_FILE_DIR + "/places.csv";
 
         return !(CSV_FILE_DIR == null) || !(CSV_FILE_NAME == null);
     }
@@ -132,20 +132,30 @@ public Configurator(String CFG_CONFIG_FILE, String CFG_SERVICE_PORT, String CFG_
     }
 
     private String correctFileDir(String dir){
-        List<String> cwdFolders = new ArrayList<> (Arrays.stream(CWD.split("/")).skip(1L).toList());
-        List<String> CSV_FILE_DIR_Folders = Arrays.stream(dir.split("/")).skip(1L).toList();
+//        List auxList = new ArrayList<>();
+        List<String> currentProjectDirectory = new ArrayList<> (Arrays.stream(CWD.split("/")).skip(1L).toList());
+        List<String> loadedProjectDirector = new ArrayList<>(Arrays.stream(dir.split("/")).skip(1L).toList());
 
-        // app folder could be something like loadshedding-2, and it derives from the cwd
-        String appFolder = cwdFolders.getLast();
-        int indexOfAppFolder = CSV_FILE_DIR_Folders.indexOf(appFolder);
+        int indexOfCurrentProjectFolder = currentProjectDirectory.indexOf(currentProjectDirectory.getLast());
+        String currentProjectFolder = currentProjectDirectory.get(indexOfCurrentProjectFolder);
+        String currentParentFolder = currentProjectDirectory.get(indexOfCurrentProjectFolder -1);
 
-        // next we create a new list containing just what comes after the appFolder from our CSV_FILE_DIR list
-        List<String> auxList = new ArrayList<>(CSV_FILE_DIR_Folders.stream() // ArrayLists makes the list mutable
-                .skip(Long.parseLong(String.valueOf(indexOfAppFolder))).toList()); // creating a list that consists of just the last 2 elements of our orignal list (CSV_FILE_DIR_FOLDERS);
+        int indexOfLoadedProjectFolder = loadedProjectDirector.indexOf(loadedProjectDirector.getLast()) -1;
+        String loadedProjectFolder= loadedProjectDirector.get(indexOfLoadedProjectFolder);
+        String loadParentFolder = loadedProjectDirector.get(indexOfLoadedProjectFolder - 1);
 
-        String correctedDir = buildDirFromLists(cwdFolders,auxList);
+        long valuesToSKip = Long.parseLong(String.valueOf(indexOfLoadedProjectFolder)) + 1;
+        List<String> auxList = new ArrayList<>(loadedProjectDirector.stream() // ArrayLists makes the list mutable
+        .skip(valuesToSKip).toList());
+
+        String correctedDir = buildDirFromLists(currentProjectDirectory,auxList);
         return correctedDir;
     }
+
+    private String correctFileDir(String dir,String fileName){
+        return correctFileDir(dir);
+    }
+
 
     private String buildDirFromLists(List<String> mainList, List<String> secondaryList){
         StringBuilder sb = new StringBuilder();
@@ -195,10 +205,20 @@ public Configurator(String CFG_CONFIG_FILE, String CFG_SERVICE_PORT, String CFG_
     }
 
     private int loadPort(int port){
+        try{
+            getPortFromConfig(port,CWD);
+        } catch (Exception e) {
+            getPortFromConfig(port,CWD + "/" + APP_DIR);
+        }
+        return PORT;
+    }
+
+    private int getPortFromConfig(int port,String propertyFileDir){
         PORT = (port == 0)
 //                ? Integer.parseInt(getProperty(CFG_SERVICE_PORT, APP_DIR,propertyFileName))
-                ? Integer.parseInt(getProperty(CFG_SERVICE_PORT, CWD ,propertyFileName))
+                ? Integer.parseInt(getProperty(CFG_SERVICE_PORT, propertyFileDir ,propertyFileName))
                 : PORT;
+
         return PORT;
     }
 
