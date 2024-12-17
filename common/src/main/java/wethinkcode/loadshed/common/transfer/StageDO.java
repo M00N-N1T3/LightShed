@@ -1,5 +1,8 @@
 package wethinkcode.loadshed.common.transfer;
 
+import static wethinkcode.loadshed.common.Helpers.isDigit;
+import static wethinkcode.loadshed.common.modelview.ModelViewFormatter.writeObjectAttributesAsJSONString;
+
 /**
  * I am a data/transfer object for communicating the loadshedding stage.
  */
@@ -26,9 +29,17 @@ public class StageDO
     public void setStage(int stage){
         this.stage = stage;
     }
+    public void setNewStage(String stage){
+        this.stage = (isDigit(stage)) ? Integer.parseInt(stage) : this.stage;
+    }
 
     public int getStage(){
         return stage;
     }
+
+    @Override
+    public String toString(){
+        return writeObjectAttributesAsJSONString(this);
+    };
 
 }

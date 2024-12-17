@@ -43,6 +43,9 @@ public class TopicSender implements Runnable {
         MQ_TOPIC_NAME =MQ_Topic_Name;
     }
 
+    public void setCmdLineMsgs(String[] msgs){
+        cmdLineMsgs = msgs;
+    }
 
     @Override
     public void run() {
@@ -50,10 +53,11 @@ public class TopicSender implements Runnable {
         if (setUpConnection()) {
             startConnection();
             try {
-                sendMessages(cmdLineMsgs.length == 0
-                        ? new String[]{"{ \"stage\":17 }"}
-                        : cmdLineMsgs);
 
+                if (cmdLineMsgs.length > 0) sendAllMessages(cmdLineMsgs);
+//                sendMessages(cmdLineMsgs.length == 0
+//                        ? new String[]{"{ \"stage\":17 }"}
+//                        : cmdLineMsgs);
             } catch (JMSException error) {
                 throw new RuntimeException(error);
             } finally {

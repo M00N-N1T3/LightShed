@@ -1,8 +1,8 @@
-package wethinkcode.loadshed.common.mq.reciever;
+package wethinkcode.stage.mq.Listener;
 import wethinkcode.loadshed.spikes.QueueReceiver;
 
-public class StageServiceQueueReceiver extends QueueReceiver {
-    public StageServiceQueueReceiver(){
+public class StageServiceQueueListener extends QueueReceiver {
+    public StageServiceQueueListener(){
         super("stage");
     }
 

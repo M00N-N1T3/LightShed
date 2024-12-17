@@ -1,4 +1,4 @@
-package wethinkcode.loadshed.common.mq.sender;
+package wethinkcode.stage.mq.sender;
 
 import wethinkcode.loadshed.spikes.QueueSender;
 

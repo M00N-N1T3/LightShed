@@ -31,7 +31,7 @@ public class Router extends ModelViewFormatter {
     private static void apiHome(){
         // guide - note ctx = context
         server.get("/", ctx -> {
-            ctx.json(convertModelToJSON(guideJSON()));
+            ctx.json(convertObejctToJsonString(guideJSON()));
         });
 
     }
@@ -41,7 +41,7 @@ public class Router extends ModelViewFormatter {
             Collection<String> provinceList = places.provinces();
 
             String status = setStatusForProvinces(provinceList,ctx);
-            String data = convertModelToJSON(provinceList.toArray());
+            String data = convertObejctToJsonString(provinceList.toArray());
             ctx.json(data);
         });
     }
@@ -51,7 +51,7 @@ public class Router extends ModelViewFormatter {
             ctx.status(HttpStatus.BAD_REQUEST);
             LinkedHashMap<String, String> guide = new LinkedHashMap<>(guideJSON());
             guide.put("message","endpoint error");
-            JsonNode modelNode = modelNode(guide);
+            JsonNode modelNode = convertModelToNode(guide);
             ctx.json(modelNode); // returning the model to the user so they can know how to use the api
         });
     }
@@ -76,7 +76,7 @@ public class Router extends ModelViewFormatter {
             ctx.status(HttpStatus.OK);
 
             if (!towns.isEmpty()){
-                String data = convertModelToJSON(model);
+                String data = convertObejctToJsonString(model);
                 ctx.json(data);
             }else{
                 ctx.json(new Object[0]);

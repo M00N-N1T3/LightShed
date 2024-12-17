@@ -3,6 +3,7 @@ package wethinkcode.stage;
 import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
+
 import wethinkcode.loadshed.common.configurator.Configurator;
 import wethinkcode.loadshed.common.transfer.StageDO;
 import wethinkcode.stage.router.Router;
@@ -28,7 +29,7 @@ public class StageService implements Runnable
     public static int DEFAULT_PORT = 7001;
     private String APP_DIR = "stage";
     private int servicePort;
-    public static StageDO stageDO = new StageDO();
+//    private static StageDO stageDO = new StageDO();
 
     // Configuration keys
     public static final String CFG_CONFIG_FILE = "config.file";
@@ -66,6 +67,10 @@ public class StageService implements Runnable
         run();
     }
 
+    public Javalin getStageServer(){
+        return stageServer;
+    }
+
     public void stop(){
         stageServer.stop();
     }
@@ -76,17 +81,18 @@ public class StageService implements Runnable
     }
 
     private Javalin initHttpServer(){
-        stageServer = Javalin.create(javalinConfig -> {
-//            javalinConfig.enableDevLogging();
-            javalinConfig.showJavalinBanner = false;
-
-        });
+        StageDO stageDO = new StageDO();
         stageDO.setStage(loadSheddingStage);
 
-        Router.configureRoutes(this);
-        Router.configureEndpointNotFoundError(stageServer);
-        return stageServer;
+        stageServer = Javalin.create(javalinConfig -> {
+            javalinConfig.showJavalinBanner = false;
+            javalinConfig.http.defaultContentType = "application/json";
+            javalinConfig.routing.treatMultipleSlashesAsSingleSlash = true;
+        });
+        stageServer.attribute("stage", stageDO);
 
+        Router.configureRoutes(this);
+        return stageServer;
     }
 
     /**

@@ -10,72 +10,98 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.C;
 import wethinkcode.loadshed.common.transfer.ScheduleDO;
 import wethinkcode.loadshed.common.modelview.ModelViewFormatter;
+import wethinkcode.loadshed.common.transfer.StageDO;
+import wethinkcode.schedule.ScheduleService;
+
 import static wethinkcode.loadshed.common.Helpers.isDigit;
-import static wethinkcode.schedule.router.Router.loadSheddingStage;
-import static wethinkcode.schedule.router.Router.scheduleService;
+
 
 public class ScheduleServiceRouterController extends ModelViewFormatter {
 
     public static final Handler guide = ctx -> {
-        JsonNode modelNode = modelNode(guideJSON());
+        JsonNode modelNode = convertModelToNode(guideJSON());
         ctx.json(modelNode);
     };
 
 
-    public static final Handler getSchedule = ctx -> {
+    public static final Handler getScheduleWithProvidedStage = ctx -> {
         String province = ctx.pathParam("province");
         String place = ctx.pathParam("place");
         String loadsheddingstage = ctx.pathParam("loadsheddingstage");
 
         if (isDigit(loadsheddingstage)){
-
-            if (validateStage(Integer.parseInt(loadsheddingstage))){
-                stageIsValid(ctx,province,place);
+            int stage = Integer.parseInt(loadsheddingstage);
+            if (stageIsValid(stage)){
+                generateSchedule(ctx,province,place,stage);
             }else {
-                badRequest(ctx,"parameter \"loadsheddingstage\", must be an integer between 0 and 8");
+                badRequest(ctx,"parameter loadsheddingstage :1 must be an integer between 0 and 8");
             }
 
         }else{
-            badRequest(ctx,"parameter \"loadsheddingstage\", must be an integer between 0 and 8");
+            badRequest(ctx,"parameter loadsheddingstage: must be an integer between 0 and 8");
         }
+    };
+
+    public static final Handler getSchedule = ctx -> {
+        String province = ctx.pathParam("province");
+        String place = ctx.pathParam("place");
+        StageDO stageDO = ctx.appAttribute("stage");
+        generateSchedule(ctx,province,place,stageDO.getStage());
     };
 
     public static void configureEndpointNotFoundError(Javalin server){
         server.error(HttpStatus.NOT_FOUND, ctx -> {
-            ctx.status(HttpStatus.BAD_REQUEST);
             LinkedHashMap<String, String> guide = new LinkedHashMap<>(guideJSON());
             guide.put("message","endpoint error");
-            JsonNode modelNode = modelNode(guide);
+            JsonNode modelNode = convertModelToNode(guide);
             ctx.json(modelNode); // returning the model to the user so they can know how to use the api
         });
     }
 
-    private static void stageIsValid(Context ctx, String province, String place){
-
-        Optional<ScheduleDO> schedulesDO = scheduleService.getSchedule(
-                province
-                ,place
-                ,loadSheddingStage);
-
-        HttpStatus status = (schedulesDO.isPresent()
-                && schedulesDO.get().numberOfDays() > 0)
-                ? HttpStatus.OK
-                : HttpStatus.NOT_FOUND;
-
-        ctx.status(status);
-        schedulesDO.ifPresent(ctx::json);
-
+    public static void configureExecutionHandler(Javalin server){
+        server.exception(Exception.class, (e, ctx) -> {
+            System.out.println("Ran into an error: " + e.getMessage());
+            System.out.println("Class: " + e.getClass());
+            e.printStackTrace();
+        });
     }
 
-    private static boolean validateStage(int stage){
+    private static void generateSchedule(Context ctx, String province, String place,int stage){
+        ScheduleService scheduleService = ctx.appAttribute("schedule");
+        Optional<ScheduleDO> scheduleDO = getSchedules(scheduleService,province,place,stage);
+        scheduleDO.ifPresent(schedules -> modelContext(ctx, schedules));
+    }
+
+    private static void modelContext(Context ctx,ScheduleDO schedule){
+        Optional<ScheduleDO> scheduleDO = Optional.of(schedule);
+        HttpStatus status = getHttpStatus(scheduleDO);
+        ctx.status(status);
+        scheduleDO.ifPresent(ctx::json);
+    }
+    private static HttpStatus getHttpStatus(Optional<ScheduleDO> scheduleDO){
+        return (scheduleDO.isPresent()
+                && scheduleDO.get().numberOfDays() > 0)
+                ? HttpStatus.OK
+                : HttpStatus.NOT_FOUND;
+    }
+
+    private static Optional<ScheduleDO> getSchedules(ScheduleService scheduleService, String province, String place, int stage){
+        return  scheduleService.getSchedule(
+                province
+                ,place
+                ,stage);
+    }
+
+    private static boolean stageIsValid(int stage){
         return stage >= 0 && stage <=8;
     }
 
     private static void badRequest(Context ctx, String message){
         ctx.status(HttpStatus.BAD_REQUEST);
-        JsonNode modelNode = modelNode(Map.of("message",message));
+        JsonNode modelNode = convertModelToNode(Map.of("message",message));
         ctx.json(modelNode);
     };
 
@@ -88,3 +114,4 @@ public class ScheduleServiceRouterController extends ModelViewFormatter {
                 ,"endpoint","{type: {GET:{/,/{province/{place}/{loadsheddingstage}}");
     }
 }
+

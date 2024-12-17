@@ -10,7 +10,7 @@ import java.util.Map;
 public class ModelViewFormatter {
     private static final ObjectMapper mapper = new ObjectMapper();
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected static <T> String stringifyObject(T object){
+    public static <T> String writeObjectAttributesAsJSONString(T object){
         try{
             return mapper.writeValueAsString(object);
         }catch (JsonProcessingException e){
@@ -18,7 +18,7 @@ public class ModelViewFormatter {
             return null;
         }
     }
-    protected static String convertModelToJSON(Object data){
+    protected static String convertObejctToJsonString(Object data){
         try{
             return mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
@@ -27,7 +27,7 @@ public class ModelViewFormatter {
         return "";
     }
 
-    protected static JsonNode generateJSONNode(String jsonString){
+    public static JsonNode generateJSONNode(String jsonString){
         try{
             return mapper.readTree(jsonString);
         } catch (JsonProcessingException e) {
@@ -36,12 +36,12 @@ public class ModelViewFormatter {
         return null;
     }
 
-    protected static JsonNode modelNode(Object model){
-        String jsonString = convertModelToJSON(model);
+    protected static JsonNode convertModelToNode(Object model){
+        String jsonString = writeObjectAttributesAsJSONString(model);
         return generateJSONNode(jsonString);
     }
 
-    protected static JsonNode modelNode(String modelAsString){
+    protected static JsonNode convertModelToNode(String modelAsString){
         return generateJSONNode(modelAsString);
     }
 

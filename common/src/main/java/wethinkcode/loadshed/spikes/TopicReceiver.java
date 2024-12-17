@@ -1,10 +1,13 @@
 package wethinkcode.loadshed.spikes;
 
 import javax.jms.*;
-import javax.swing.*;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import wethinkcode.loadshed.common.mq.MQ;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * I am a small "maker" app for receiving MQ messages from the Stage Service by
@@ -17,6 +20,7 @@ public class TopicReceiver implements Runnable
     public static String MQ_TOPIC_NAME = "stage";
     private boolean running = true;
     private Connection connection;
+    private MessageConsumer messageConsumer;
 
 
     public static void main( String[] args ){
@@ -34,40 +38,47 @@ public class TopicReceiver implements Runnable
 
     @Override
     public void run(){
-        setUpMessageListener();
-        strtConenction();
+        setUpMessageConsumer();
+        setMessageConsumerListener();
+        startConnection();
         while( running ){
-//            System.out.println( "Still doing stufff..." );
             snooze();
         }
         closeConnection();
         System.out.println( "Bye..." );
     }
 
-    private void setUpMessageListener(){
+    protected void setUpMessageConsumer(){
         try{
             final ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory( MQ.URL );
             connection = factory.createConnection( MQ.USER, MQ.PASSWD );
 
             final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            final Destination dest = session.createTopic( MQ_TOPIC_NAME ); // <-- NB: Topic, not Queue!
+            final Destination destination = session.createTopic( MQ_TOPIC_NAME ); // <-- NB: Topic, not Queue!
 
-            final MessageConsumer receiver = session.createConsumer( dest );
-
-            receiver.setMessageListener( message->{
-                // this is for debug purpose only
-                System.out.println("Message From Topic: " + message.toString());
-                if (message instanceof TextMessage){
-                    handleMessage(message);
-                }
-            });
-
+            messageConsumer = session.createConsumer( destination );
         }catch( JMSException erk ){
             throw new RuntimeException( erk );
         }
     }
 
-    private void snooze(){
+    protected MessageConsumer getMessageConsumer(){
+        return messageConsumer;
+    }
+
+    public void setMessageConsumerListener(){
+        try{
+            messageConsumer.setMessageListener(message ->{
+                if (message instanceof TextMessage){
+                    handleMessage(message);
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void snooze(){
         try{
             Thread.sleep( NAP_TIME );
         }catch( InterruptedException eek ){
@@ -75,7 +86,7 @@ public class TopicReceiver implements Runnable
         }
     }
 
-    private void strtConenction(){
+    protected void startConnection(){
         try{
             connection.start();
         } catch (JMSException e) {
@@ -83,16 +94,16 @@ public class TopicReceiver implements Runnable
         }
     }
 
-    private void closeConnection(){
+    protected void closeConnection(){
         if( connection != null ) try{
+            running =false;
             connection.close();
         }catch( JMSException ex ){
             // meh
         }
     }
 
-
-    private void handleMessage(Message message){
+    public void handleMessage(Message message){
         try{
             String body = ((TextMessage) message).getText();
 
@@ -109,12 +120,24 @@ public class TopicReceiver implements Runnable
         }
     }
 
-    public void setRunningStatusTrue() {
+    protected void setRunningStatusTrue() {
         running = true;
     }
 
-    public void setRunningStatusFalse(){
+     protected void setRunningStatusFalse(){
         running = false;
     }
 
+    protected void checkOverrideOfMethod(List<String> methods){
+        String currentClass = this.getClass().getSimpleName();
+
+        List<String> methodsInClass = Arrays.stream(this.getClass().getDeclaredMethods())
+                .map(Method::getName).toList();
+
+        for (String method : methods) {
+            if (!methodsInClass.contains(method)){
+                throw new RuntimeException(method + ": not found in " + currentClass + " class. Override method in " + currentClass +" from the parent class!");
+            }
+        }
+    }
 }
