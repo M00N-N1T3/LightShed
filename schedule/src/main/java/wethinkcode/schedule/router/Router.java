@@ -1,12 +1,10 @@
 package wethinkcode.schedule.router;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
-
-import wethinkcode.loadshed.common.modelview.ModelViewFormatter;
 import wethinkcode.schedule.ScheduleService;
 import wethinkcode.schedule.controller.ScheduleServiceRouterController;
 
-public class Router extends ModelViewFormatter {
+public class Router{
     // ROUTES
     private static final String HOME = "/";
     private static final String SCHEDULE_WITH_PROVIDED_STAGE = "/{province}/{place}/{loadsheddingstage}";

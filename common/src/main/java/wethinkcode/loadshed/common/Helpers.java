@@ -1,5 +1,9 @@
 package wethinkcode.loadshed.common;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
 public class Helpers {
     public static boolean isDigit(String string){
         try {
@@ -38,5 +42,18 @@ public class Helpers {
         }
 
         return capString.toString();
+    }
+
+    protected void checkOverrideOfMethod(List<String> methods){
+        String currentClass = this.getClass().getSimpleName();
+
+        List<String> methodsInClass = Arrays.stream(this.getClass().getDeclaredMethods())
+                .map(Method::getName).toList();
+
+        for (String method : methods) {
+            if (!methodsInClass.contains(method)){
+                throw new RuntimeException(method + ": not found in " + currentClass + " class. Override method in " + currentClass +" from the parent class!");
+            }
+        }
     }
 }

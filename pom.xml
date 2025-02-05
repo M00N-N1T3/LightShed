@@ -13,6 +13,7 @@
         <module>common</module>
         <module>sandbox</module>
         <module>queue</module>
+        <module>alert</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

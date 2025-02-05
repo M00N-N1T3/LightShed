@@ -1,8 +1,8 @@
 package wethinkcode.web.router;
 
 import wethinkcode.web.WebService;
-import wethinkcode.web.controllers.ProvinceController;
-import wethinkcode.web.controllers.ScheduleController;
+import wethinkcode.web.controller.ProvinceController;
+import wethinkcode.web.controller.ScheduleController;
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class Router {

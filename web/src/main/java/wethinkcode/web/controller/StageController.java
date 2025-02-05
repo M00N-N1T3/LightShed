@@ -1,4 +1,4 @@
-package wethinkcode.web.controllers;
+package wethinkcode.web.controller;
 
 import io.javalin.http.Context;
 import io.javalin.http.Handler;

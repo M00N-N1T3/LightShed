@@ -7,17 +7,15 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.HttpStatus;
 import wethinkcode.loadshed.common.modelview.ModelViewFormatter;
+import wethinkcode.loadshed.common.mq.sender.ServiceTopicSender;
 import wethinkcode.loadshed.common.transfer.StageDO;
-import wethinkcode.stage.mq.sender.StageServiceTopicSender;
+
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//import static wethinkcode.stage.StageService.stageDO;
-
-
 public class StageServiceRouterController extends ModelViewFormatter {
-    private static final StageServiceTopicSender topicSender = new StageServiceTopicSender();
+    private static final ServiceTopicSender topicSender = new ServiceTopicSender("stage");
 
     public static final Handler guide = ctx -> {
         setCTXHeader(ctx);

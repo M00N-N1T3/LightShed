@@ -9,8 +9,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
 
+import wethinkcode.loadshed.common.mq.listener.ServiceTopicListener;
 import wethinkcode.loadshed.common.transfer.StageDO;
-import wethinkcode.schedule.mq.listener.ScheduleServiceTopicListener;
 import wethinkcode.schedule.router.Router;
 import wethinkcode.loadshed.common.transfer.DayDO;
 import wethinkcode.loadshed.common.transfer.ScheduleDO;
@@ -24,7 +24,7 @@ public class ScheduleService {
     public static final int DEFAULT_STAGE = 0; // no loadshedding. Ha!
     private final static StageDO stageDO = new StageDO(DEFAULT_STAGE);
     public static final int DEFAULT_PORT = 7002;
-    private ScheduleServiceTopicListener scheduleServiceTopicListener;
+    private ServiceTopicListener scheduleServiceTopicListener;
 
     Javalin scheduleServer;
 
@@ -49,7 +49,7 @@ public class ScheduleService {
         scheduleServer = initHttpServer();
 
         // Topic Listener
-        scheduleServiceTopicListener = new ScheduleServiceTopicListener("stage",this);
+        scheduleServiceTopicListener = new ServiceTopicListener("stage",scheduleServer);
         return this;
     }
 

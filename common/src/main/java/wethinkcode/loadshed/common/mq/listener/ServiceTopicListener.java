@@ -1,4 +1,4 @@
-package wethinkcode.schedule.mq.listener;
+package wethinkcode.loadshed.common.mq.listener;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,7 +6,7 @@ import io.javalin.Javalin;
 import wethinkcode.loadshed.common.modelview.ModelViewFormatter;
 import wethinkcode.loadshed.common.transfer.StageDO;
 import wethinkcode.loadshed.spikes.TopicReceiver;
-import wethinkcode.schedule.ScheduleService;
+
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -14,17 +14,13 @@ import javax.jms.TextMessage;
 import java.util.List;
 
 
-public class ScheduleServiceTopicListener extends TopicReceiver {
+
+public class ServiceTopicListener extends TopicReceiver {
     private final Javalin server;
 
-    public ScheduleServiceTopicListener(ScheduleService scheduleService) {
-        super("schedule");
-        server = scheduleService.getScheduleServer();
-    }
-
-    public ScheduleServiceTopicListener(String topic, ScheduleService scheduleService) {
+    public ServiceTopicListener(String topic, Javalin server) {
         super(topic);
-        server = scheduleService.getScheduleServer();
+        this.server = server;
     }
 
     public void start() {

@@ -45,8 +45,8 @@ public class QueueSender implements Runnable
 
     @Override
     public void run() {
-
-        if (setUpConnection()){
+        if (msgProducer == null) setUpConnection();
+        if(msgProducer!=null){
             startConnection();
             try {
                 sendAllMessages(cmdLineMsgs.length == 0
@@ -65,9 +65,8 @@ public class QueueSender implements Runnable
         }
 
     }
-
-    private boolean setUpConnection(){
-        try{
+    protected boolean setUpConnection() {
+        try {
             // setting up connection
             final ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(MQ_URL); // the address we're connecting to
             connection = factory.createConnection(MQ_USER, MQ_PASSWD); // takes our username and password to establish connections
@@ -85,7 +84,7 @@ public class QueueSender implements Runnable
         }
     }
 
-    private boolean startConnection(){
+    protected boolean startConnection(){
         try{
             connection.start();
             return true;
@@ -94,7 +93,7 @@ public class QueueSender implements Runnable
         }
     }
 
-    private void sendAllMessages( String[] messages) throws JMSException {
+    protected void sendAllMessages( String[] messages) throws JMSException {
         try{
             StreamMessage messageStream = messageFormatter.getStreamMessage(messages);
             msgProducer.send(messageStream);
@@ -103,9 +102,12 @@ public class QueueSender implements Runnable
         }
     }
 
+    protected MessageProducer getMsgProducer(){
+        return msgProducer;
+    }
 
     // send message will be generic method, that can handle either Streams, Strings or Maps
-    private void sendMessage(String message){
+    protected void sendMessage(String message){
         try{
             TextMessage textMessage = messageFormatter.getTextMessage(message);
             msgProducer.send(textMessage);
@@ -114,7 +116,7 @@ public class QueueSender implements Runnable
         }
     }
 
-    private void sendMapMessage(Map<String, ?> mappedMessage){
+    protected void sendMapMessage(Map<String, ?> mappedMessage){
         try{
             MapMessage message = messageFormatter.getMapMessage(mappedMessage);
             msgProducer.send(message);
@@ -122,7 +124,7 @@ public class QueueSender implements Runnable
             throw new RuntimeException(error);
         }
     }
-    private void sendMessage(Message message){
+    protected void sendMessage(Message message){
         try{
             msgProducer.send(message);
         }catch (JMSException error){
@@ -130,7 +132,7 @@ public class QueueSender implements Runnable
         }
     }
 
-    private void closeResources(){
+    protected void closeResources(){
         try{
             if( session != null ) session.close();
             if(msgProducer != null) msgProducer.close();
@@ -141,6 +143,10 @@ public class QueueSender implements Runnable
         session = null;
         msgProducer = null;
         connection = null;
+    }
+
+    protected void setMessage(String[] message){
+        this.cmdLineMsgs = message;
     }
 
 }
